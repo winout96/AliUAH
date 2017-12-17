@@ -1,0 +1,25 @@
+{
+   "browser_action": {
+      "default_popup": "popup.html",
+      "default_title": "Конвертер валют PrivatBank"
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "content.js" ],
+      "matches": [ "*://*.aliexpress.com/*" ],
+      "run_at": "document_end"
+   } ],
+   "description": "Ali UAH by Winout. Конвертирует цену по курсу приватбанка на сайте AliExpress",
+   "icons": {
+      "512": "icon.png"
+   },
+   "background": {
+      "scripts": ["background.js"],
+      "persistent": true
+   },
+   "manifest_version": 2,
+   "name": "Ali UAH",
+   "permissions": [ "<all_urls>", "tabs"],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.2.1"
+}
