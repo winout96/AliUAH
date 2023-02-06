@@ -15,7 +15,7 @@ document.querySelector('#refresh').onclick = (e) => {
 }
 
 
-/* TODO
+/* TODO:
 при изменении курса - оповещение popup и обновление
 chrome.runtime.onMessage.addListener(function(msg, _, sendResponse) {
 	log('Got message from background page: ' + msg);
@@ -24,7 +24,9 @@ chrome.runtime.onMessage.addListener(function(msg, _, sendResponse) {
 function toNum(num) {
 	num = num.toString()
 		.trim()
-		.replace(',', '.')
+		.replace(/,/gm, '.')
+		.replace(/[^\d.]|(\.)(?=\d+\.)/gm, '')// remove not . numbers and not last .
+		.replace(/^\./, '0.') // .5 to 0.5
 		.match(/\d+(\.\d+)?/gm)[0];
 
 	num = parseFloat(num);
@@ -77,6 +79,7 @@ function init (str) {
 
 	//--------------------------------------------------------
 
+	// if user select price on page
 	if (str != '') {// it's a kostyl time...
 		let num = toNum(str);
 		inp.usd.value = num;
@@ -88,13 +91,16 @@ function init (str) {
 		});
 	}
 
+
+	inp.usd.focus();
+
 }
 
 chrome.runtime.sendMessage('getInfoPopup', msg => {
 	rate = msg.rate;
 
 	if (!rate) {
-		let txt = 'Нет информации по курсу валют';
+		let txt = 'Немає інформації по курсу валют';
 		alert(txt);
 		throw new Error(txt);
 	}

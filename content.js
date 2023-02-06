@@ -55,8 +55,14 @@ function processPrice (str) {
 function getMoney (node) {
     let textNodes = getTextNode(node);
     for (let i = 0, l = textNodes.length; i < l; i++) {
+		console.log(textNodes[i].textContent);
         if (!textNodes[i].textContent.includes("грн")) {
-            textNodes[i].textContent = processPrice(textNodes[i].textContent);
+			
+			var newtext = processPrice(textNodes[i].textContent);
+			if(textNodes[i].textContent != newtext){
+				textNodes[i].textContent = newtext
+				}
+            
         }
     }
 }
@@ -70,17 +76,15 @@ let mo = new MutationObserver(
     function(allmutations) {
         //console.dir(allmutations);
         allmutations.forEach(function(mr) {
-            let n = mr.addedNodes.length
-            for (let i = 0; i < n; i++) {
-                getMoney(mr.target);
-            }
+			//console.dir(mr.target);
+			getMoney(mr.target);
         });
     }
 );
 
 function init () {
     if(/c_tp=(\w{3})/gi.exec(document.cookie)[1] != "USD"){
-        alert("Смените показ цены из "+/c_tp=(\w{3});/gi.exec(document.cookie)[1]+" на USD!!!");
+        alert("Змініть показ ціни із "+/c_tp=(\w{3});/gi.exec(document.cookie)[1]+" на USD!!!");
         scrollTo(0,0);
         document.querySelector("#switcher-info").click();
         document.querySelector("#nav-global > div.ng-item.ng-switcher.active > div > div > div.switcher-currency.item.util-clearfix > div > span > a").click();
@@ -92,10 +96,11 @@ function init () {
 
     getMoney(document.body);
 
-    mo.observe(document.body, {
+mo.observe(document.body, {
         'childList': true,
         'subtree': true,
-        'attributes': false
+        'attributes': false,
+		'characterData': true
     });
 
     if(onlyUrl(/^\/item|store\/product/g, "pathname")){

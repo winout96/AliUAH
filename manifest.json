@@ -9,7 +9,7 @@
       "matches": [ "*://*.aliexpress.com/*" ],
       "run_at": "document_end"
    } ],
-   "description": "Ali UAH by Winout. Конвертирует цену по курсу приватбанка на сайте AliExpress",
+   "description": "Ali UAH. Конвертує ціну по курсу ПриватБанка на сайті AliExpress. By Winout96 and iSkile.",
    "icons": {
       "512": "icon.png"
    },
@@ -21,5 +21,5 @@
    "name": "Ali UAH",
    "permissions": [ "<all_urls>", "tabs"],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.2.1"
+   "version": "0.3.1"
 }
