@@ -1,23 +1,21 @@
-"use strict";
-let rate =
-    (localStorage.rate != undefined && JSON.parse(localStorage.rate)) || {},
+'use strict';
+let rate = (localStorage.rate != undefined && JSON.parse(localStorage.rate)) || {},
   updInterval = 30 * 60 * 1000; // min, sec, ms;
 
 function toFixed(value, precision) {
   if (precision < 1) {
-    throw new Error("Precision must be grather than 1");
+    throw new Error('Precision must be grather than 1');
   }
 
-  let [int, fract = "0"] = value.toString().split(".");
+  let [int, fract = '0'] = value.toString().split('.');
 
-  fract = fract.slice(0, precision).padEnd(precision, "0");
+  fract = fract.slice(0, precision).padEnd(precision, '0');
 
   return `${int}.${fract}`;
 }
 
 chrome.browserAction.setBadgeBackgroundColor({ color: [52, 73, 94, 255] });
-if (Object.keys(rate).length)
-  chrome.browserAction.setBadgeText({ text: toFixed(rate.sale, 2) });
+if (Object.keys(rate).length) chrome.browserAction.setBadgeText({ text: toFixed(rate.sale, 2) });
 
 function updRate(forceUpdate) {
   let emptyRate = !Object.keys(rate).length;
@@ -25,12 +23,8 @@ function updRate(forceUpdate) {
   if (forceUpdate || emptyRate || +new Date() - rate.time > updInterval) {
     return new Promise((resolve) => {
       let xhr = new XMLHttpRequest();
-      xhr.open(
-        "GET",
-        "https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=11",
-        true
-      );
-      xhr.responseType = "json";
+      xhr.open('GET', 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=11', true);
+      xhr.responseType = 'json';
 
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -38,7 +32,7 @@ function updRate(forceUpdate) {
             // console.log(xhr.response[0]);
             let old = Object.assign({}, rate);
             let usd = xhr.response.find((item) => {
-              return item.ccy == "USD";
+              return item.ccy == 'USD';
             });
 
             rate = {};
@@ -78,8 +72,8 @@ function getText() {
     chrome.tabs.query(
       {
         active: true,
-        windowType: "normal",
-        url: "*://*/*",
+        windowType: 'normal',
+        url: '*://*/*',
       },
       (tab) => {
         if (tab[0]) {
@@ -87,34 +81,30 @@ function getText() {
         } else {
           reject();
         }
-      }
+      },
     );
   })
     .then(
       (tabId) =>
         new Promise((_resolve) => {
-          chrome.tabs.executeScript(
-            tabId,
-            { code: "window.getSelection().toString()" },
-            (str) => _resolve(str)
-          );
-        })
+          chrome.tabs.executeScript(tabId, { code: 'window.getSelection().toString()' }, (str) => _resolve(str));
+        }),
     )
     .then(
       (str) => str[0].trim(),
-      () => ""
+      () => '',
     );
 }
 
 chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
   switch (msg) {
-    case "getInfoPopup":
+    case 'getInfoPopup':
       getText().then((str) => sendResponse({ rate, str, updInterval }));
       break;
-    case "getRate":
+    case 'getRate':
       sendResponse({ rate });
       break;
-    case "reloadRate":
+    case 'reloadRate':
       updRate(true).then(() => sendResponse({ rate }));
       break;
   }
