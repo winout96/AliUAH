@@ -5,7 +5,7 @@
   </head>
   <body>
     <div id="refresh">
-      <img title="Оновити" src="refresh.png" />
+      <img title="Оновити" src="../../img/refresh.png" />
     </div>
 
     Продаж: <span id="course_sale"></span><br />
@@ -21,13 +21,23 @@
       <input placeholder="$ 0.00" type="text" id="usd" />
     </p>
 
+    <hr />
+
+    <label for="provider">Курс по:</label>
+    <select id="provider">
+      <option value="privatBank">ПриватБанк</option>
+      <option value="monoBank">MonoBank</option>
+    </select>
+
+    <hr />
+
     Останнє оновлення курсу: <span id="course_time"></span>
 
     <script type="text/javascript" src="popup.js"></script>
     <style type="text/css">
       body {
         font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-        background: url('funky-lines.png') #fafafa;
+        background: url('../../img/funky-lines.png') #fafafa;
         color: #515151;
       }
       input[type='text'] {
