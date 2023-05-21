@@ -16,12 +16,14 @@
     "512": "icon.png"
   },
   "background": {
-    "scripts": ["background.js"],
-    "persistent": true
+    "service_worker": "service-worker.js",
+    "type": "module"
   },
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Ali UAH",
-  "permissions": ["<all_urls>", "tabs"],
+  "permissions": ["tabs"],
+  "host_permissions": ["*://*.aliexpress.com/"],
+  "optional_host_permissions": ["*://*/*"],
   "update_url": "https://clients2.google.com/service/update2/crx",
-  "version": "0.3.1"
+  "version": "1.0.0"
 }

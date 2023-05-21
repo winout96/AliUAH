@@ -52,12 +52,14 @@ function getTextNode(elem) {
       }
     }
   };
+
   inspectText(elem);
+
   return nodes;
 }
 
 function processPrice(str) {
-  return str.replace(regmoney, function (str, p1, p2, offset, s) {
+  return str.replace(moneyRegex, function (str, p1, p2, offset, s) {
     //console.log(arguments);
     return (
       USD2UAH(p1) +
@@ -84,14 +86,12 @@ function getMoney(node) {
 }
 
 //Получаем курс
-let rate = 23.52;
+let rate = 1;
 
-const regmoney = /(?:US\s+)?\$\s*([\d\.,]+)(?:\s+-\s+([\d\.,]+))?\b/gi;
+const moneyRegex = /(?:US\s+)?\$\s*([\d\.,]+)(?:\s+-\s+([\d\.,]+))?\b/gi;
 
-let mo = new MutationObserver(function (allmutations) {
-  //console.dir(allmutations);
-  allmutations.forEach(function (mr) {
-    //console.dir(mr.target);
+let mo = new MutationObserver(function (allMutations) {
+  allMutations.forEach(function (mr) {
     getMoney(mr.target);
   });
 });
@@ -121,14 +121,14 @@ function init() {
     characterData: true,
   });
 
-  if (onlyUrl(/^\/item|store\/product/g, 'pathname')) {
-    /*  document.querySelector("#j-sku-discount-price").addEventListener("DOMSubtreeModified", function (e) {
-            getMoney(e.target);
-        }, false);*/
-    /* document.querySelector("#j-sku-price").addEventListener("DOMSubtreeModified", function (e) {
-            console.dir(e);
-        }, false);*/
-  }
+  // if (onlyUrl(/^\/item|store\/product/g, 'pathname')) {
+  //   /*  document.querySelector("#j-sku-discount-price").addEventListener("DOMSubtreeModified", function (e) {
+  //           getMoney(e.target);
+  //       }, false);*/
+  //   /* document.querySelector("#j-sku-price").addEventListener("DOMSubtreeModified", function (e) {
+  //           console.dir(e);
+  //       }, false);*/
+  // }
 
   console.timeEnd('uahAli');
 }

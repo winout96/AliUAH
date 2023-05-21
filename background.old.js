@@ -2,6 +2,11 @@
 let rate = (localStorage.rate != undefined && JSON.parse(localStorage.rate)) || {},
   updInterval = 30 * 60 * 1000; // min, sec, ms;
 
+/**
+ * @param {string|number} value
+ * @param {number} precision
+ * @returns {string}
+ */
 function toFixed(value, precision) {
   if (precision < 1) {
     throw new Error('Precision must be grather than 1');
