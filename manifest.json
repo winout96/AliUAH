@@ -1,25 +1,34 @@
 {
-   "browser_action": {
-      "default_popup": "popup.html",
-      "default_title": "Конвертер валют PrivatBank"
-   },
-   "content_scripts": [ {
+  "action": {
+    "default_popup": "./src/popup/popup.html",
+    "default_title": "Конвертер валют для AliExpress"
+  },
+  "content_scripts": [
+    {
       "all_frames": true,
-      "js": [ "content.js" ],
-      "matches": [ "*://*.aliexpress.com/*" ],
+      "js": ["./src/content.js"],
+      "matches": ["*://*.aliexpress.com/*"],
       "run_at": "document_end"
-   } ],
-   "description": "Ali UAH. Конвертує ціну по курсу ПриватБанка на сайті AliExpress. By Winout96 and iSkile.",
-   "icons": {
-      "512": "icon.png"
-   },
-   "background": {
-      "scripts": ["background.js"],
-      "persistent": true
-   },
-   "manifest_version": 2,
-   "name": "Ali UAH",
-   "permissions": [ "<all_urls>", "tabs"],
-   "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.3.1"
+    }
+  ],
+  "description": "Ali UAH. Конвертує ціну по курсу ПриватБанку або МоноБанку на сайті AliExpress. By Winout96 and iSkile.",
+  "icons": {
+    "512": "./img/icon-512.png",
+    "128": "./img/icon-128.png"
+  },
+  "background": {
+    "service_worker": "src/service-worker.js",
+    "type": "module"
+  },
+  "manifest_version": 3,
+  "name": "Ali UAH",
+  "permissions": ["scripting", "activeTab", "storage"],
+  "host_permissions": [
+    "*://*.aliexpress.com/",
+    "https://api.privatbank.ua/p24api/pubinfo",
+    "https://api.monobank.ua/bank/currency"
+  ],
+  "optional_host_permissions": ["*://*/*"],
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  "version": "2.0.0"
 }
