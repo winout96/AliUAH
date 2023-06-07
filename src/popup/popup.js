@@ -7,7 +7,7 @@ const providerOption = document.querySelector('#provider');
 let rate = {
   sale: 0,
   buy: 0,
-  lastUpdateRate: 0,
+  time: 0,
 };
 
 document.querySelector('#refresh').onclick = (e) => {
@@ -94,7 +94,7 @@ function initProvider(selectedProvider) {
 }
 
 function init(str) {
-  const dateStr = formatDate(rate.lastUpdateRate);
+  const dateStr = formatDate(new Date(rate.time));
   document.querySelector('#course_time').textContent = dateStr;
 
   //--------------------------------------------------------
@@ -128,13 +128,14 @@ function init(str) {
 
 chrome.runtime.sendMessage('getInfoPopup', (msg) => {
   console.log(msg);
+
   rate = msg.rate;
-  rate.lastUpdateRate = new Date(msg.lastUpdateRate);
 
   initProvider(msg.rateProvider);
 
-  // if (ts - rate.ts > msg.updInterval) {
-  //   document.querySelector('#course_time').style.color = 'red';
-  // }
+  if (Date.now() - rate.ts > msg.updateInterval) {
+    document.querySelector('#course_time').style.color = 'red';
+  }
+
   init(msg.str);
 });

@@ -17,7 +17,7 @@
     "128": "./img/icon-128.png"
   },
   "background": {
-    "service_worker": "src/service-worker.js",
+    "service_worker": "src/service-worker.mjs",
     "type": "module"
   },
   "manifest_version": 3,
