@@ -22,7 +22,7 @@
   },
   "manifest_version": 3,
   "name": "Ali UAH",
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": ["activeTab", "alarms", "storage", "scripting"],
   "host_permissions": [
     "*://*.aliexpress.com/",
     "https://api.privatbank.ua/p24api/pubinfo",

@@ -77,9 +77,10 @@ function getMoney(node) {
   for (let i = 0, l = textNodes.length; i < l; i++) {
     console.log(textNodes[i].textContent);
     if (!textNodes[i].textContent.includes('грн')) {
-      var newtext = processPrice(textNodes[i].textContent);
-      if (textNodes[i].textContent != newtext) {
-        textNodes[i].textContent = newtext;
+      const newText = processPrice(textNodes[i].textContent);
+
+      if (textNodes[i].textContent != newText) {
+        textNodes[i].textContent = newText;
       }
     }
   }
@@ -133,7 +134,7 @@ function init() {
   console.timeEnd('uahAli');
 }
 
-chrome.runtime.sendMessage('getRate', function (res) {
+chrome.runtime.sendMessage({ type: 'getRate' }, function (res) {
   rate = res.rate.sale;
   init();
 });

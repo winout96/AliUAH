@@ -1,6 +1,5 @@
 import { Rate } from './utils/rate.mjs';
 
-const updateInterval = 30 * 60 * 1000; // 30 min
 const config = {
   rateProvider: 'privatBank',
   rate: { sale: 0, buy: 0, time: 0 },
@@ -109,49 +108,61 @@ async function init() {
   chrome.action.setBadgeBackgroundColor({ color: [52, 73, 94, 255] });
   if (Object.keys(rate).length) chrome.action.setBadgeText({ text: toFixed(rate.sale, 2) });
 
-  await updateRate();
+  chrome.alarms.create('update-rate', {
+    delayInMinutes: 0,
+    periodInMinutes: 30,
+  });
+  chrome.alarms.onAlarm.addListener(handleAlarm);
+}
 
-  setInterval(updateRate, updateInterval);
+async function handleAlarm(alarm) {
+  console.log(`Alarm "${alarm.name}" fired`, JSON.stringify(alarm));
+
+  switch (alarm.name) {
+    case 'update-rate': {
+      await updateRate();
+      break;
+    }
+    default: {
+      console.warn('Unknown alarm', alarm);
+    }
+  }
 }
 
 init();
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (typeof msg === 'string') {
-    switch (msg) {
-      case 'getInfoPopup': {
-        getSelectedText().then((str) => {
-          const { rate, rateProvider } = config;
-          sendResponse({ rate, str, rateProvider, updateInterval });
-        });
+chrome.runtime.onMessage.addListener(({ type, data }, sender, sendResponse) => {
+  switch (type) {
+    case 'getInfoPopup': {
+      getSelectedText().then((str) => {
+        const { rate, rateProvider } = config;
+        sendResponse({ rate, str, rateProvider });
+      });
 
-        break;
-      }
-      case 'getRate': {
-        sendResponse({ rate: config.rate });
-        break;
-      }
-      case 'reloadRate': {
-        updateRate().then((rate) => {
-          sendResponse({ rate });
-        });
-        break;
-      }
+      break;
     }
-  } else {
-    switch (msg.type) {
-      case 'setProvider': {
-        const { data: rateProvider } = msg;
+    case 'getRate': {
+      sendResponse({ rate: config.rate });
 
-        updateConfig('rateProvider', rateProvider);
+      break;
+    }
+    case 'reloadRate': {
+      updateRate().then((rate) => {
+        sendResponse({ rate });
+      });
 
-        updateRate().then((rate) => {
-          sendResponse({ rate });
-        });
+      break;
+    }
+    case 'setProvider': {
+      updateConfig('rateProvider', data);
 
-        break;
-      }
+      updateRate().then((rate) => {
+        sendResponse({ rate });
+      });
+
+      break;
     }
   }
+
   return true;
 });

@@ -13,7 +13,7 @@ let rate = {
 document.querySelector('#refresh').onclick = (e) => {
   e.target.hidden = true;
   document.body.style.backgroundColor = '#CFD8DC';
-  chrome.runtime.sendMessage('reloadRate', (r) => {
+  chrome.runtime.sendMessage({ type: 'reloadRate' }, (r) => {
     location.reload();
   });
 };
@@ -126,16 +126,16 @@ function init(str) {
   inp.usd.focus();
 }
 
-chrome.runtime.sendMessage('getInfoPopup', (msg) => {
+chrome.runtime.sendMessage({ type: 'getInfoPopup' }, (msg) => {
   console.log(msg);
 
   rate = msg.rate;
 
   initProvider(msg.rateProvider);
 
-  if (Date.now() - rate.ts > msg.updateInterval) {
+  init(msg.str);
+
+  if (Date.now() - rate.time > 30 * 60 * 1000) {
     document.querySelector('#course_time').style.color = 'red';
   }
-
-  init(msg.str);
 });
