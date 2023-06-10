@@ -110,7 +110,7 @@ async function init() {
 
   chrome.alarms.create('update-rate', {
     delayInMinutes: 0,
-    periodInMinutes: 30,
+    periodInMinutes: 3,
   });
   chrome.alarms.onAlarm.addListener(handleAlarm);
 }
@@ -120,7 +120,9 @@ async function handleAlarm(alarm) {
 
   switch (alarm.name) {
     case 'update-rate': {
-      await updateRate();
+      if (Date.now() - config.rate.time >= 30 * 60 * 1000) {
+        await updateRate();
+      }
       break;
     }
     default: {
