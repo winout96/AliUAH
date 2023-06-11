@@ -75,7 +75,7 @@ function processPrice(str) {
 function getMoney(node) {
   let textNodes = getTextNode(node);
   for (let i = 0, l = textNodes.length; i < l; i++) {
-    console.log(textNodes[i].textContent);
+    // console.log(textNodes[i].textContent);
     if (!textNodes[i].textContent.includes('грн')) {
       const newText = processPrice(textNodes[i].textContent);
 
@@ -97,20 +97,50 @@ let mo = new MutationObserver(function (allMutations) {
   });
 });
 
+function getCookieByName(name) {
+  const values = document.cookie.split('; ');
+  for (const item of values) {
+    const pos = item.indexOf('=');
+    const key = item.slice(0, pos);
+    if (key === name) {
+      return decodeURIComponent(item.slice(pos + 1));
+    }
+  }
+}
+
+function checkAndFixCurrency(recheck = false) {
+  const requiredCurrencyUnit = 'USD';
+  const cookiesKey = 'aep_usuc_f';
+
+  const cookieValue = getCookieByName(cookiesKey);
+  if (!cookieValue) return;
+
+  const currencyUnit = /c_tp=(\w{3})/i.exec(document.cookie)?.[1];
+
+  if (currencyUnit !== requiredCurrencyUnit) {
+    const newValue = currencyUnit
+      ? cookieValue.replace(/(c_tp)=(\w{3})/i, `$1=${requiredCurrencyUnit}`)
+      : `${cookieValue}&c_tp=${requiredCurrencyUnit}`;
+
+    const expireDate = new Date();
+    expireDate.setTime(expireDate.getTime() + 365 * 24 * 60 * 60 * 1000);
+
+    const updatedCookie = `${cookiesKey}=${newValue}; expires=${expireDate.toGMTString()}; path=/; domain=.aliexpress.com; Secure`;
+    document.cookie = updatedCookie;
+    console.log(`Changed currency to ${requiredCurrencyUnit} from ${currencyUnit}`, { updatedCookie });
+
+    setTimeout(() => checkAndFixCurrency(true), 1000);
+  } else if (recheck) {
+    console.log('Currency is correct', { currencyUnit });
+
+    document.write('Currency changed, reloading...');
+    setTimeout(() => location.reload(), 1500);
+  }
+}
+
 function init() {
-  if (/c_tp=(\w{3})/gi.exec(document.cookie)[1] != 'USD') {
-    alert('Змініть показ ціни із ' + /c_tp=(\w{3});/gi.exec(document.cookie)[1] + ' на USD!!!');
-    scrollTo(0, 0);
-    document.querySelector('#switcher-info').click();
-    document
-      .querySelector(
-        '#nav-global > div.ng-item.ng-switcher.active > div > div > div.switcher-currency.item.util-clearfix > div > span > a',
-      )
-      .click();
-
-    //document.querySelector("#nav-global > div.ng-item.ng-switcher.active > div > div > div.switcher-currency.item.util-clearfix > div > ul > li:nth-child(1) > a").click();
-
-    //document.querySelector("#nav-global > div.ng-item.ng-switcher.active > div > div > div.switcher-btn.item.util-clearfix > button").click();
+  if (/\.?aliexpress.com$/i.test(location.hostname)) {
+    checkAndFixCurrency();
   }
 
   getMoney(document.body);
