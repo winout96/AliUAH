@@ -21,8 +21,19 @@ function USD2UAH(num) {
 
 function getTextNode(elem) {
   let nodes = [];
+  const newPriceNodes = /^US \$\d+(?:\.\d+)?(?:\s\([\d\.\,]+\sгрн\))?$/i;
+
   if (elem.nodeType == 3) {
     nodes.push(elem);
+
+    const elemText = elem.textContent.trim();
+    if (/^\d$/.test(elemText)) {
+      const parentNode = elem?.parentElement?.parentElement;
+      const parentText = parentNode?.textContent;
+      if (parentText && newPriceNodes.test(parentText)) {
+        processNewPriceNode(parentNode);
+      }
+    }
     return nodes;
   }
 
@@ -30,12 +41,17 @@ function getTextNode(elem) {
     let els = node.childNodes;
     if (els) {
       for (let i = 0, n = els.length; i < n; ++i) {
-        if (els[i].nodeType == 3) {
-          if (els[i].textContent.trim() != '') {
-            nodes.push(els[i]);
+        const elem = els[i];
+        const textContent = elem.textContent.trim();
+
+        if (elem.nodeType == 3) {
+          if (textContent !== '') {
+            nodes.push(elem);
           }
-        } else if (els[i].nodeType == 1) {
-          let tag = els[i].tagName.toLowerCase();
+        } else if (elem.nodeType == 1) {
+          if (!textContent) continue;
+
+          let tag = elem.tagName.toLowerCase();
           if (
             !(
               tag == 'textarea' ||
@@ -46,7 +62,11 @@ function getTextNode(elem) {
               tag == 'head'
             )
           ) {
-            inspectText(els[i]);
+            if (elem.childNodes.length > 2 && newPriceNodes.test(textContent)) {
+              processNewPriceNode(elem);
+            } else {
+              inspectText(elem);
+            }
           }
         }
       }
@@ -72,6 +92,29 @@ function processPrice(str) {
   });
 }
 
+function processNewPriceNode(node) {
+  const str = Array.from(node.childNodes).reduce(
+    (acc, curr) => (curr.className === 'uahAli__uah' ? acc : acc + curr.innerText),
+    '',
+  );
+  const newText = ` (${str.replace(moneyRegex, function (str, p1, p2, offset, s) {
+    return `${USD2UAH(p1)}${p2 != undefined ? ' - ' + USD2UAH(p2) : ''} грн`;
+  })})`;
+
+  if (node.lastElementChild.className == uahClassName) {
+    textNode = node.lastElementChild.firstChild;
+    textNode.textContent = newText;
+  } else {
+    const span = document.createElement('span');
+    span.className = uahClassName;
+
+    const textNode = document.createTextNode(newText);
+    span.appendChild(textNode);
+
+    node.appendChild(span);
+  }
+}
+
 function getMoney(node) {
   let textNodes = getTextNode(node);
   for (let i = 0, l = textNodes.length; i < l; i++) {
@@ -90,6 +133,8 @@ function getMoney(node) {
 let rate = 1;
 
 const moneyRegex = /(?:US\s+)?\$\s*([\d\.,]+)(?:\s+-\s+([\d\.,]+))?\b/gi;
+
+const uahClassName = 'uahAli__uah';
 
 let mo = new MutationObserver(function (allMutations) {
   allMutations.forEach(function (mr) {
