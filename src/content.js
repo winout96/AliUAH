@@ -94,7 +94,7 @@ function processPrice(str) {
 
 function processNewPriceNode(node) {
   const str = Array.from(node.childNodes).reduce(
-    (acc, curr) => (curr.className === 'uahAli__uah' ? acc : acc + curr.innerText),
+    (acc, curr) => (curr.className === uahClassName ? acc : acc + curr.innerText),
     '',
   );
   const newText = ` (${str.replace(moneyRegex, function (str, p1, p2, offset, s) {
