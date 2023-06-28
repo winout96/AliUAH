@@ -7,13 +7,13 @@ const providerOption = document.querySelector('#provider');
 let rate = {
   sale: 0,
   buy: 0,
-  lastUpdateRate: 0,
+  time: 0,
 };
 
 document.querySelector('#refresh').onclick = (e) => {
   e.target.hidden = true;
   document.body.style.backgroundColor = '#CFD8DC';
-  chrome.runtime.sendMessage('reloadRate', (r) => {
+  chrome.runtime.sendMessage({ type: 'reloadRate' }, (r) => {
     location.reload();
   });
 };
@@ -94,7 +94,7 @@ function initProvider(selectedProvider) {
 }
 
 function init(str) {
-  const dateStr = formatDate(rate.lastUpdateRate);
+  const dateStr = formatDate(new Date(rate.time));
   document.querySelector('#course_time').textContent = dateStr;
 
   //--------------------------------------------------------
@@ -126,15 +126,16 @@ function init(str) {
   inp.usd.focus();
 }
 
-chrome.runtime.sendMessage('getInfoPopup', (msg) => {
+chrome.runtime.sendMessage({ type: 'getInfoPopup' }, (msg) => {
   console.log(msg);
+
   rate = msg.rate;
-  rate.lastUpdateRate = new Date(msg.lastUpdateRate);
 
   initProvider(msg.rateProvider);
 
-  // if (ts - rate.ts > msg.updInterval) {
-  //   document.querySelector('#course_time').style.color = 'red';
-  // }
   init(msg.str);
+
+  if (Date.now() - rate.time > 30 * 60 * 1000) {
+    document.querySelector('#course_time').style.color = 'red';
+  }
 });

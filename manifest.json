@@ -17,12 +17,12 @@
     "128": "./img/icon-128.png"
   },
   "background": {
-    "service_worker": "src/service-worker.js",
+    "service_worker": "src/service-worker.mjs",
     "type": "module"
   },
   "manifest_version": 3,
   "name": "Ali UAH",
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": ["activeTab", "alarms", "storage", "scripting"],
   "host_permissions": [
     "*://*.aliexpress.com/",
     "https://api.privatbank.ua/p24api/pubinfo",
